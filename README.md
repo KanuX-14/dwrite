@@ -6,8 +6,11 @@ Usage:
 ## INFORMATION ##
 
 -c: check devices.
+
 -u: umount a device.
+
 -p: the path of the device.
+
 -v: show the version of the script.
 
 ## TO FORMAT THE DEVICE ##
@@ -17,6 +20,7 @@ Usage:
 ## TO FLASH A IMAGE TO THE DEVICE ##
 
 -i: the path of the image.
+
 -F: flash a image into the device.
 
 REMEMBER: You need to use the uppercase flags (-W/-F) ever at the end!
