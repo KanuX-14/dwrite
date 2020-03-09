@@ -3,6 +3,11 @@ Shell script to format &amp; write or flash a bootable device.
 
 Usage:
 
+First give permission to run this script:
+```shell
+$ chmod +x dwrite
+```
+
 ## INFORMATION ##
 
 -c: check devices.
