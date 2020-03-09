@@ -1,0 +1,87 @@
+#!/bin/bash
+
+function umountF(){
+	sudo umount "$Dpath""1"
+}
+
+function writeF(){
+	if [ "$ARG" == "FAT32" ]
+	then
+		sudo mkfs.vfat "$Dpath""1"
+	elif [ "$ARG" == "EXT4" ]
+	then
+		sudo mkfs.ext4 "$Dpath""1"
+	elif [ "$ARG" == "NTFS" ]
+	then
+		sudo mkfs.ntfs "$Dpath""1"
+	fi
+}
+
+function flashF(){
+	sudo dd if=$Ipath of=$Dpath bs=4M conv=fdatasync
+}
+
+function checkF(){
+	sudo fdisk -l
+}
+
+function helpF(){
+	echo "
+  Usage:
+  
+  ## INFORMATION ##
+  
+  -c: check devices.
+  -u: umount a device.
+  -p: the path of the device.
+  -v: show the version of the script.
+  
+  ## TO FORMAT THE DEVICE ##
+  
+  -W: write the format to the usb table. (FAT32/EXT4/NTFS)
+  
+  ## TO FLASH A IMAGE TO THE DEVICE ##
+  	
+  -i: the path of the image.
+  -F: flash a image into the device.
+  
+  REMEMBER: You need to use the uppercase flags (-W/-F) ever at the end!
+	    Don't mix the Write and Flash commands!   
+	    Use the main partition to describe it. The script will automatically write in the correct table.
+	    Example:
+	    
+	    /dev/sdb
+	    /dev/sdc
+	    /dev/sde
+	    ...
+"
+}
+
+function versionF(){
+	echo "  dwriter 1.0 - by: KanuX"
+}
+
+while getopts ":hcuFvtW:i:p:" opt; do
+	case $opt in
+	h) helpF
+	;;
+	c) checkF
+	;;
+	u) umountF
+	;;
+	i) Ipath="$OPTARG"
+	;;
+	p) Dpath="$OPTARG"
+	;;
+	W) ARG="$OPTARG"; writeF
+	;;
+	F) flashF
+	;;
+	v) versionF
+	;;
+	\?) helpF
+	;;
+	*) helpF
+	;;
+	esac
+done
