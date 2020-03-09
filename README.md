@@ -26,12 +26,6 @@ Usage:
 REMEMBER: You need to use the uppercase flags (-W/-F) ever at the end!
           Don't mix the Write and Flash commands!   
           Use the main partition to describe it. The script will automatically write in the correct table.
-          Example:
-          
-          /dev/sdb
-          /dev/sdc
-          /dev/sde
-          ...
 
 Example:
 ```shell
