@@ -1,19 +1,22 @@
 #!/bin/bash
 
 function umountF(){
-	sudo umount "$Dpath""1"
+	sudo umount "$Dpath"
 }
 
 function writeF(){
 	if [ "$ARG" == "FAT32" ]
 	then
-		sudo mkfs.vfat "$Dpath""1"
+		sudo mkfs.fat -F32 -v -l "$Dpath"
 	elif [ "$ARG" == "EXT4" ]
 	then
-		sudo mkfs.ext4 "$Dpath""1"
+		sudo mkfs.ext4 -F -O ^64bit -L '' "$Dpath"
 	elif [ "$ARG" == "NTFS" ]
 	then
-		sudo mkfs.ntfs "$Dpath""1"
+		sudo mkfs.ntfs -Q -v -F -L '' "$Dpath"
+	elif [ "$ARG" == "EMPTY" ]
+	then
+		sudo dd if=/dev/zero of=$Dpath bs=512 count=1
 	fi
 }
 
@@ -38,7 +41,7 @@ function helpF(){
   
   ## TO FORMAT THE DEVICE ##
   
-  -W: write the format to the usb table. (FAT32/EXT4/NTFS)
+  -W: write the format to the usb table. (FAT32/EXT4/NTFS/EMPTY)
   
   ## TO FLASH A IMAGE TO THE DEVICE ##
   	
@@ -58,7 +61,7 @@ function helpF(){
 }
 
 function versionF(){
-	echo "  dwriter 1.0 - by: KanuX"
+	echo "  dwriter 1.1 - by: KanuX"
 }
 
 while getopts ":hcuFvtW:i:p:" opt; do
