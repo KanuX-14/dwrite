@@ -16,12 +16,12 @@ function writeF(){
 		sudo mkfs.ntfs -Q -v -F -L '' "$Dpath"
 	elif [ "$ARG" == "EMPTY" ]
 	then
-		sudo dd if=/dev/zero of=$Dpath bs=512 count=1
+		sudo dd if=/dev/zero of="$Dpath" bs=512 count=1
 	fi
 }
 
 function flashF(){
-	sudo dd if=$Ipath of=$Dpath bs=4M conv=fdatasync
+	sudo dd if="$Ipath" of="$Dpath" bs=4M conv=fdatasync
 }
 
 function checkF(){
@@ -30,20 +30,19 @@ function checkF(){
 
 function helpF(){
 	echo "
-  Usage:
-  
-  ## INFORMATION ##
+
+  [INFORMATION]
   
   -c: check devices.
-  -u: umount a device.
   -p: the path of the device.
+  -u: umount a device.
   -v: show the version of the script.
   
-  ## TO FORMAT THE DEVICE ##
+  [TO FORMAT THE DEVICE]
   
   -W: write the format to the usb table. (FAT32/EXT4/NTFS/EMPTY)
   
-  ## TO FLASH A IMAGE TO THE DEVICE ##
+  [TO FLASH A IMAGE TO THE DEVICE]
   	
   -i: the path of the image.
   -F: flash a image into the device.
@@ -61,7 +60,7 @@ function helpF(){
 }
 
 function versionF(){
-	echo "  dwriter 1.1 - by: KanuX"
+	echo "  dwriter 1.2 - KanuX-14 | 07/19/2020 ~ 10:04 AM"
 }
 
 while getopts ":hcuFvtW:i:p:" opt; do
