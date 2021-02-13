@@ -1,89 +1,56 @@
 #!/bin/bash
 
-function umountF(){
-	sudo umount "$Dpath"
-}
-
-function writeF(){
-	if [ "$ARG" == "FAT32" ]
-	then
-		sudo mkfs.fat -F32 -v -l "$Dpath"
-	elif [ "$ARG" == "EXT4" ]
-	then
-		sudo mkfs.ext4 -F -O ^64bit -L '' "$Dpath"
-	elif [ "$ARG" == "NTFS" ]
-	then
-		sudo mkfs.ntfs -Q -v -F -L '' "$Dpath"
-	elif [ "$ARG" == "EMPTY" ]
-	then
-		sudo dd if=/dev/zero of="$Dpath" bs=512 count=1
-	fi
-}
-
-function flashF(){
-	sudo dd if="$Ipath" of="$Dpath" bs=4M conv=fdatasync
-}
-
-function checkF(){
-	sudo fdisk -l
-}
+IPATH=''; DPATH=''; ARG=''
 
 function helpF(){
-	echo "
-
-  [INFORMATION]
-  
-  -c: check devices.
-  -p: the path of the device.
-  -u: umount a device.
-  -v: show the version of the script.
-  
-  [TO FORMAT THE DEVICE]
-  
-  -W: write the format to the usb table. (FAT32/EXT4/NTFS/EMPTY)
-  
-  [TO FLASH A IMAGE TO THE DEVICE]
-  	
-  -i: the path of the image.
-  -F: flash a image into the device.
-  
-  REMEMBER: You need to use the uppercase flags (-W/-F) ever at the end!
-	    Don't mix the Write and Flash commands!   
-	    Use the main partition to describe it. The script will automatically write in the correct table.
-	    Example:
-	    
-	    /dev/sdb
-	    /dev/sdc
-	    /dev/sde
-	    ...
-"
+  printf '\n  \e[0;32m[INFORMATION]\n\n  [INITIAL FLAGS]\e[m\n\n  -c: check devices.\n  -o: the path of the device.\n  -i: the ISO image.\n  -v: show the version of the script.\n  -F: format tables.(FAT32/EXT4/NTFS/ZERO)\n\n  \e[0;32m[TO FORMAT THE DEVICE]\e[m\n\n  Use the device path and the format that you desire to write:\n    dwrite -o /dev/sdx -F EXT4\n\n  \e[0;32m[TO FLASH A IMAGE TO THE DEVICE]\e[m\n\n  Use the ISO path and device flags:\n    dwrite -o /dev/sdx -i /path/of/the.iso\n\n  Use the main partition to describe it. The script will automatically write in the correct table.\n    Example:\n      /dev/sdb\n      /dev/sdc\n      /dev/sde\n      ...\n'
 }
 
 function versionF(){
-	echo "  dwriter 1.2 - KanuX-14 | 07/19/2020 ~ 10:04 AM"
+  printf '\n  dwrite 2.0 - \e[0;36mKanuX-14\e[m | 12/04/2021 ~ 09:38 PM\n'
+  exit
 }
 
-while getopts ":hcuFvtW:i:p:" opt; do
-	case $opt in
-	h) helpF
-	;;
-	c) checkF
-	;;
-	u) umountF
-	;;
-	i) Ipath="$OPTARG"
-	;;
-	p) Dpath="$OPTARG"
-	;;
-	W) ARG="$OPTARG"; writeF
-	;;
-	F) flashF
-	;;
-	v) versionF
-	;;
-	\?) helpF
-	;;
-	*) helpF
-	;;
-	esac
+function checkDevices(){
+  sudo fdisk -l
+  exit
+}
+
+function main(){
+  ARG=$(printf "$ARG" | tr [a-z] [A-Z])
+  DPATH=$(printf "$DPATH" | tr [A-Z] [a-z])
+  if [ ! -z $IPATH ] && [ ! -z $DPATH ] && [ -z $ARG ]; then
+    sudo dd if="$IPATH" of="$DPATH" bs=4M conv=fdatasync
+    exit
+  elif [ ! -z $DPATH ] && [ ! -z $ARG ] && [ -z $IPATH ]; then
+    sudo umount "$DPATH"
+    if [ "$ARG" == "FAT32" ]; then
+      sudo mkfs.fat -F32 -v -l "$DPATH"
+    elif [ "$ARG" == "EXT4" ]; then
+      sudo mkfs.ext4 -F -O ^64bit -L '' "$DPATH"
+    elif [ "$ARG" == "NTFS" ]; then
+      sudo mkfs.ntfs -Q -v -F -L '' "$DPATH"
+    elif [ "$ARG" == "ZERO" ]; then
+      sudo dd if=/dev/zero of="$DPATH" bs=512 count=1
+    elif [ "$ARG" != "FAT32" ] || [ "$ARG" != "EXT4" ] || [ "$ARG" != "NTFS" ] || [ "$ARG" != "ZERO" ] ; then
+      printf 'This format is not supported or does not exists.'
+      exit
+    fi
+    read -p 'Reconnect your device to mount it.' enter
+    exit
+  elif true; then
+    helpF
+  fi
+}
+
+while getopts ":vVcCi:I:o:O:f:F:" opt; do
+  case $opt in
+    v|V) versionF ;;
+    c|C) checkDevices ;;
+    i|I) IPATH="$OPTARG" ;;
+    o|O) DPATH="$OPTARG" ;;
+    f|F) ARG="$OPTARG" ;;
+  esac
 done
+
+main
