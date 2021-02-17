@@ -8,7 +8,7 @@ int checkDevices(){
 }
 
 void version(){
-  printf("\n  dwrite 2.1 - \e[0;36mKanuX-14\e[m | 15/04/2021 ~ 01:23 AM\n");
+  printf("\n  dwrite 2.2 - \e[0;36mKanuX-14\e[m | 16/02/2021 ~ 09:32 PM\n");
 }
 
 void help(){
@@ -43,8 +43,6 @@ void main(int argc, char **argv){
       case 'F':
         arg = optarg;
         break;
-      case '?':
-        printf("I don't understand.");
     }
   }
   if((ipath != NULL) && (dpath != NULL) && (arg == NULL)){
